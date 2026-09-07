@@ -1,4 +1,5 @@
 const express= require("express");
+const fetch = require("node-fetch"); 
 const app= express();
 app.get("/",async(quries,responses)=>{
     const data=quries.headers;
@@ -15,7 +16,7 @@ app.get("/",async(quries,responses)=>{
       ],
     };
       
-          const fetchReq= await fetch(`process.env.CUSTOMIZE_AI_API`,{  method: 'POST',
+          const fetchReq= await fetch(process.env.CUSTOMIZE_AI_API,{  method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
