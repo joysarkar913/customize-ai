@@ -1,8 +1,9 @@
 const express= require("express");
 const app= express();
+const cors=require('cors')
 // Middleware to parse JSON body
 app.use(express.json());
-
+app.use(cors({origin:"https://zerocorruptions.web.app/"}))
 // Middleware to parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 app.get("/",async(quries,responses)=>{
