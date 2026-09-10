@@ -1,3 +1,4 @@
+const fetch = require("node-fetch");
 const express = require("express");
 const fs = require("fs");
 const app = express();
@@ -6,65 +7,33 @@ const path = require("path");
 
 const filePath = path.join(__dirname, "data.json");
 
-// Increment count with date reset
-function incrementCount() {
-  const date = new Date();
-  const dateSet = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  let data = JSON.parse(fileContent);
+function apiPath() {
+  const apis = [
+    process.env.CUSTOMIZE_AI_API,
+    process.env.CUSTOMIZE_AI_API_L1,
+    process.env.CUSTOMIZE_AI_API_L2,
+    process.env.CUSTOMIZE_AI_API_L3,
+    process.env.CUSTOMIZE_AI_API_L4,
+    process.env.CUSTOMIZE_AI_API_L5,
+  ].filter(Boolean);
 
-  if (data.date === dateSet) {
-    data.count = (data.count || 0) + 1;
-  } else {
-    data.count = 0;
-    data.date = dateSet;
+  if (apis.length === 0) {
+    throw new Error("No API endpoints configured in environment variables");
   }
 
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-  return "done"
-}
-
-// Select API path based on count thresholds
-function apiPath() {
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const data = JSON.parse(fileContent);
-
-
-const apis = [
-  process.env.CUSTOMIZE_AI_API,
-  process.env.CUSTOMIZE_AI_API_L1,
-  process.env.CUSTOMIZE_AI_API_L2,
-  process.env.CUSTOMIZE_AI_API_L3,
-  process.env.CUSTOMIZE_AI_API_L4,
-  process.env.CUSTOMIZE_AI_API_L5,
-];
-
-return apis[Math.floor(Math.random() * apis.length)];;
+  return apis[Math.floor(Math.random() * apis.length)];
 }
 
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
-app.get("/increase", (req, res) => {
-const resp=incrementCount();
-res.send(resp)
-});
-// ✅ New endpoint: Read only count
-app.get("/count", (req, res) => {
-  try {
-    const fileContent = fs.readFileSync(filePath, "utf-8");
-    const data = JSON.parse(fileContent);
-    res.json({ count: data.count || 0 });
-  } catch (error) {
-    res.status(500).json({ error: "Unable to read count" });
-  }
-});
+
 app.get("/", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.query;
   const t = props.type
-     fs.writeFileSync("data.json", JSON.stringify({"total":100,"name":"joy"}, null, 2));
+     fs.writeFileSync("data.json", JSON.stringify({"total":200,"name":"joy"}, null, 2));
   try {
 
 
