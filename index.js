@@ -29,7 +29,7 @@ async function storeResponse(userRequest, aiResponse) {
 }
 
 app.post('/train_data',(req,res)=>{
-  const {request,response}=req;
+  const {request,response}=req.body;
   const responseSend=storeResponse(request,response)
   res.send(responseSend)
 })
