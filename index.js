@@ -1,10 +1,33 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const {MongoClient}=require('mongodb')
 app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
 // Select API path based on count thresholds
+async function DataPush(requests,responses) {
+  const URL=process.env.MONG
+  const client = new MongoClient(URL);
+await client.connect();
+  const db = client.db("DataPoint"); // Database name
+  const collection = db.collection("requestandresponses"); // Collection name
+
+  const logEntry = {
+    request: requests,
+    response: responses,
+    timestamp: new Date()
+  };
+
+  await collection.insertOne(logEntry);
+  console.log("Data saved to requestandresponses!");
+  await client.close();
+}
+app.post("/ai_trainer",(req,res)=>{
+  const {requests,responses}=req.body;
+  const ressender=DataPush(requests,responses);
+  res.send(ressender);
+})
 function apiPath() {
 const apis = [
   process.env.CUSTOMIZE_AI_API,
