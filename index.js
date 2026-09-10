@@ -1,39 +1,30 @@
-const fetch = require("node-fetch");
 const express = require("express");
-const fs = require("fs");
 const app = express();
 const cors = require("cors");
-const path = require("path");
-
-const filePath = path.join(__dirname, "data.json");
-
-function apiPath() {
-  const apis = [
-    process.env.CUSTOMIZE_AI_API,
-    process.env.CUSTOMIZE_AI_API_L1,
-    process.env.CUSTOMIZE_AI_API_L2,
-    process.env.CUSTOMIZE_AI_API_L3,
-    process.env.CUSTOMIZE_AI_API_L4,
-    process.env.CUSTOMIZE_AI_API_L5,
-  ].filter(Boolean);
-
-  if (apis.length === 0) {
-    throw new Error("No API endpoints configured in environment variables");
-  }
-
-  return apis[Math.floor(Math.random() * apis.length)];
-}
-
-// Middleware
 app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
+// Select API path based on count thresholds
+function apiPath() {
+const apis = [
+  process.env.CUSTOMIZE_AI_API,
+  process.env.CUSTOMIZE_AI_API_L1,
+  process.env.CUSTOMIZE_AI_API_L2,
+  process.env.CUSTOMIZE_AI_API_L3,
+  process.env.CUSTOMIZE_AI_API_L4,
+  process.env.CUSTOMIZE_AI_API_L5,
+];
+
+return apis[Math.floor(Math.random() * apis.length)];;
+}
+
+// Middleware
+// ✅ New endpoint: Read only count
 
 app.get("/", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.query;
   const t = props.type
-     fs.writeFileSync("data.json", JSON.stringify({"total":200,"name":"joy"}, null, 2));
   try {
 
 
