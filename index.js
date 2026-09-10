@@ -6,6 +6,32 @@ app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
 // Select API path based on count thresholds
+
+const module1_generater=async(genProms)=>{
+    try {
+    const payload = {
+      contents: [
+        {
+          parts: [{ text: genProms }],
+        },
+      ],
+    };
+    const pathRecog=apiPath();
+    const fetchReq = await fetch(pathRecog, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+    const reqJson = await fetchReq.json();
+    return reqJson;
+  
+  } catch (error) {
+    return error;
+  }
+
+}
 async function DataPush(requests,responses) {
   const URL=process.env.MONG
   const client = new MongoClient(URL);
@@ -48,33 +74,9 @@ app.get("/", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.query;
   const t = props.type
-   responses.send(module1_generater(props.text));
+  const progress= await module1_generater(props.text);
+  responses.send(progress);
 })
-const module1_generater=async(genProms)=>{
-    try {
-    const payload = {
-      contents: [
-        {
-          parts: [{ text: genProms }],
-        },
-      ],
-    };
-    const pathRecog=apiPath();
-    const fetchReq = await fetch(pathRecog, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-    const reqJson = await fetchReq.json();
-    return reqJson;
-  
-  } catch (error) {
-    return error;
-  }
-
-}
 app.post("/workflow", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.body;
@@ -83,7 +85,8 @@ app.post("/workflow", async (quries, responses) => {
   const label = props.label;
 
   const genProms = `Generate a list of ${types} based on the following criteria: \[Insert criteria, e.g., ${criteria}\]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: { "title": ${label}, "description": "Short description", "link": "URL", "body": "Detailed ${types} content" }.${process.env.CUSTOMIZE_RES}`
-  responses.send(module1_generater(genProms));
+ const progress=await module1_generater(genProms);
+  responses.send(progress);
 })
 
 app.post("/question_and_answer", async (quries, responses) => {
@@ -92,7 +95,8 @@ app.post("/question_and_answer", async (quries, responses) => {
   const types = props.question;
   const last_Conversation = props.last
   const genProms = `Generate a answer based on the following question: \[ ${types} \] ${last_Conversation}. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {  "answer": "answer only","isGet":"if answer not found then put false else true" }.if answer not found then put all details/problems to answer field ${process.env.CUSTOMIZE_RES}`
-   responses.send(module1_generater(genProms));
+  const progress=await module1_generater(genProms);
+  responses.send(progress);
 })
 
 
@@ -102,7 +106,8 @@ app.post("/letter_writer", async (quries, responses) => {
   const types = props.question;
   const last_Conversation = props.last
   const genProms = `Generate a purfect latter on the following criteria: \[ ${types} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"answer": "" } write as reacjs format html with embedded css format use line break ,space every thing properlymast usabel for reactjs. ${process.env.CUSTOMIZE_RES}`
-  responses.send(module1_generater(genProms));
+ const progress=await module1_generater(genProms);
+  responses.send(progress);
 })
 
 
@@ -112,7 +117,8 @@ app.post("/fromsubmission", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
   const genProms = `Generate a draft of complaint based on the following complain criteria: \[ ${criteria.complain} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"comp_draft": "proper a complain letter dont use complainer name or phone or email , write mail as anonymous person","tegto": "find out some local authority mail id by using address of complainer and put here if unable to get the keep blank","isGet":"if answer not found then put false else true" }. ${process.env.CUSTOMIZE_RES}`
-    responses.send(module1_generater(genProms));
+   const progress=await module1_generater(genProms);
+  responses.send(progress);
 })
 
 
