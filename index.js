@@ -48,13 +48,14 @@ app.get("/", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.query;
   const t = props.type
-  try {
-
-
+   responses.send(module1_generater(props.text));
+})
+const module1_generater=async(genProms)=>{
+    try {
     const payload = {
       contents: [
         {
-          parts: [{ text: props.text }],
+          parts: [{ text: genProms }],
         },
       ],
     };
@@ -67,13 +68,13 @@ app.get("/", async (quries, responses) => {
       body: JSON.stringify(payload),
     })
     const reqJson = await fetchReq.json();
-
-    responses.send(reqJson);
+    return reqJson;
+  
   } catch (error) {
-    responses.send(error)
+    return error;
   }
-})
 
+}
 app.post("/workflow", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.body;
@@ -82,30 +83,7 @@ app.post("/workflow", async (quries, responses) => {
   const label = props.label;
 
   const genProms = `Generate a list of ${types} based on the following criteria: \[Insert criteria, e.g., ${criteria}\]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: { "title": ${label}, "description": "Short description", "link": "URL", "body": "Detailed ${types} content" }.${process.env.CUSTOMIZE_RES}`
-  try {
-
-
-    const payload = {
-      contents: [
-        {
-          parts: [{ text: genProms }],
-        },
-      ],
-    };
-    const pathRecog=apiPath();
-    const fetchReq = await fetch(pathRecog, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-    const reqJson = await fetchReq.json();
-
-    responses.send(reqJson);
-  } catch (error) {
-    responses.send(error)
-  }
+  responses.send(module1_generater(genProms));
 })
 
 app.post("/question_and_answer", async (quries, responses) => {
@@ -114,30 +92,7 @@ app.post("/question_and_answer", async (quries, responses) => {
   const types = props.question;
   const last_Conversation = props.last
   const genProms = `Generate a answer based on the following question: \[ ${types} \] ${last_Conversation}. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {  "answer": "answer only","isGet":"if answer not found then put false else true" }.if answer not found then put all details/problems to answer field ${process.env.CUSTOMIZE_RES}`
-  try {
-
-
-    const payload = {
-      contents: [
-        {
-          parts: [{ text: genProms }],
-        },
-      ],
-    };
-    const pathRecog=apiPath();
-    const fetchReq = await fetch(pathRecog, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-    const reqJson = await fetchReq.json();
-
-    responses.send(reqJson);
-  } catch (error) {
-    responses.send(error)
-  }
+   responses.send(module1_generater(genProms));
 })
 
 
@@ -147,32 +102,7 @@ app.post("/letter_writer", async (quries, responses) => {
   const types = props.question;
   const last_Conversation = props.last
   const genProms = `Generate a purfect latter on the following criteria: \[ ${types} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"answer": "" } write as reacjs format html with embedded css format use line break ,space every thing properlymast usabel for reactjs. ${process.env.CUSTOMIZE_RES}`
-
-
-  try {
-
-
-    const payload = {
-      contents: [
-        {
-          parts: [{ text: genProms }],
-        },
-      ],
-    };
-    const pathRecog=apiPath();
-    const fetchReq = await fetch(pathRecog, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    const reqJson = await fetchReq.json();
-    responses.send(reqJson);
-  } catch (error) {
-    responses.send(error)
-  }
+  responses.send(module1_generater(genProms));
 })
 
 
@@ -182,29 +112,7 @@ app.post("/fromsubmission", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
   const genProms = `Generate a draft of complaint based on the following complain criteria: \[ ${criteria.complain} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"comp_draft": "proper a complain letter dont use complainer name or phone or email , write mail as anonymous person","tegto": "find out some local authority mail id by using address of complainer and put here if unable to get the keep blank","isGet":"if answer not found then put false else true" }. ${process.env.CUSTOMIZE_RES}`
-  try {
-
-
-    const payload = {
-      contents: [
-        {
-          parts: [{ text: genProms }],
-        },
-      ],
-    };
-    const pathRecog=apiPath();
-    const fetchReq = await fetch(pathRecog, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-    const reqJson = await fetchReq.json();
-    responses.send(reqJson);
-  } catch (error) {
-    responses.send(error)
-  }
+    responses.send(module1_generater(genProms));
 })
 
 
