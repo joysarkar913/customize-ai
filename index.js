@@ -4,36 +4,6 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 
-const { MongoClient } = require("mongodb");
-const fetch = require("node-fetch");
-app.use(express.json());
-app.use(cors({ origin: "https://zerocorruptions.web.app" }));
-app.use(express.urlencoded({ extended: true }));
-const uri = process.env.MONG;
-const client = new MongoClient(uri);
-
-async function storeResponse(userRequest, aiResponse) {
-  await client.connect();
-  const db = client.db("DataPoint"); // Database name
-  const collection = db.collection("requestandresponses"); // Collection name
-
-  const logEntry = {
-    request: userRequest,
-    response: aiResponse,
-    timestamp: new Date()
-  };
-
-  await collection.insertOne(logEntry);
-  console.log("Data saved for trained new module you can make request for delete this data");
-  await client.close();
-}
-
-app.post('/train_data',(req,res)=>{
-  const {request,response}=req.body;
-  const responseSend=storeResponse(request,response)
-  res.send(responseSend)
-})
-
 const filePath = path.join(__dirname, "data.json");
 
 // Increment count with date reset
@@ -56,6 +26,10 @@ function incrementCount() {
 
 // Select API path based on count thresholds
 function apiPath() {
+  const fileContent = fs.readFileSync(filePath, "utf-8");
+  const data = JSON.parse(fileContent);
+
+
 const apis = [
   process.env.CUSTOMIZE_AI_API,
   process.env.CUSTOMIZE_AI_API_L1,
@@ -69,7 +43,9 @@ return apis[Math.floor(Math.random() * apis.length)];;
 }
 
 // Middleware
-
+app.use(express.json());
+app.use(cors({ origin: "https://zerocorruptions.web.app" }));
+app.use(express.urlencoded({ extended: true }));
 app.get("/increase", (req, res) => {
 const resp=incrementCount();
 res.send(resp)
@@ -108,7 +84,7 @@ app.get("/", async (quries, responses) => {
       body: JSON.stringify(payload),
     })
     const reqJson = await fetchReq.json();
-    
+
     responses.send(reqJson);
   } catch (error) {
     responses.send(error)
@@ -121,7 +97,7 @@ app.post("/workflow", async (quries, responses) => {
   const types = props.type;
   const criteria = props.criteria;
   const label = props.label;
- 
+
   const genProms = `Generate a list of ${types} based on the following criteria: \[Insert criteria, e.g., ${criteria}\]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: { "title": ${label}, "description": "Short description", "link": "URL", "body": "Detailed ${types} content" }.${process.env.CUSTOMIZE_RES}`
   try {
 
@@ -142,7 +118,7 @@ app.post("/workflow", async (quries, responses) => {
       body: JSON.stringify(payload),
     })
     const reqJson = await fetchReq.json();
-      
+
     responses.send(reqJson);
   } catch (error) {
     responses.send(error)
@@ -174,7 +150,7 @@ app.post("/question_and_answer", async (quries, responses) => {
       body: JSON.stringify(payload),
     })
     const reqJson = await fetchReq.json();
-      
+
     responses.send(reqJson);
   } catch (error) {
     responses.send(error)
@@ -208,7 +184,7 @@ app.post("/letter_writer", async (quries, responses) => {
       },
       body: JSON.stringify(payload),
     })
-     
+
     const reqJson = await fetchReq.json();
     responses.send(reqJson);
   } catch (error) {
