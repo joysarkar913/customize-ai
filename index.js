@@ -6,7 +6,70 @@ app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
 // Select API path based on count thresholds
+function apiPath() {
+const apis = [
+  process.env.CUSTOMIZE_AI_API,
+  process.env.CUSTOMIZE_AI_API_L1,
+  process.env.CUSTOMIZE_AI_API_L2,
+  process.env.CUSTOMIZE_AI_API_L3,
+  process.env.CUSTOMIZE_AI_API_L4,
+  process.env.CUSTOMIZE_AI_API_L5,
+];
 
+return apis[Math.floor(Math.random() * apis.length)];;
+}
+
+// async function module2_generater(prompt) {
+//   const url = process.env.URL_M2;
+//   const requiredData = process.env.M2_REQUIORED; // Store your key in env variable
+
+//   const body = {
+//     model: "openai/gpt-oss-20b",
+//     input: prompt,
+//   };
+
+//   try {
+//     const response = await fetch(url, {
+//       method: "POST",
+//       headers: {
+//         "Authorization": `Bearer ${requiredData}`,
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(body),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+//     console.log("Groq Response:", data);
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching Groq response:", error);
+//     throw error;
+//   }
+// }
+
+async function module_Trainer(params) {
+ const response =await fetch(process.env.TRAINER,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(params)}) 
+const result= await response.json();
+return result;
+}
+async function module_Trainer_Data() {
+ const response =await fetch(process.env.TRAINER,{method:"GET",headers:{'Content_Type':'application/json'}}) 
+const result= await response.json();
+return result;
+}
+app.post('/trained_my_module',async(req,res)=>{
+const traineddata=await module_Trainer(req.body);
+res.send(traineddata)
+})
+
+app.get('/trained_my_module',async ()=>{
+const traineddata=await module_Trainer_Data();
+res.send(traineddata)
+})
 const module1_generater=async(genProms)=>{
     try {
     const payload = {
@@ -54,18 +117,6 @@ app.post("/ai_trainer",(req,res)=>{
   const ressender=DataPush(requests,responses);
   res.send(ressender);
 })
-function apiPath() {
-const apis = [
-  process.env.CUSTOMIZE_AI_API,
-  process.env.CUSTOMIZE_AI_API_L1,
-  process.env.CUSTOMIZE_AI_API_L2,
-  process.env.CUSTOMIZE_AI_API_L3,
-  process.env.CUSTOMIZE_AI_API_L4,
-  process.env.CUSTOMIZE_AI_API_L5,
-];
-
-return apis[Math.floor(Math.random() * apis.length)];;
-}
 
 // Middleware
 // ✅ New endpoint: Read only count
@@ -74,9 +125,11 @@ app.get("/", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.query;
   const t = props.type
-  const progress= await module1_generater(props.text);
-  responses.send(progress);
+  // const progress= await module1_generater(props.text);
+  // responses.send(progress);
+  responses.send("Test Mode, GET request not accepted and unauthorized access denied")
 })
+
 app.post("/workflow", async (quries, responses) => {
   const data = quries.headers;
   const props = quries.body;
@@ -111,7 +164,13 @@ app.post("/letter_writer", async (quries, responses) => {
 })
 
 
-
+app.post("/mock_test", async (quries, responses) => {
+  const data = quries.headers;
+  const criteria = quries.body;
+  const genProms = `Generate a mock question answers based on \[ ${criteria.complain} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"question": "question","body": "only body if required else skip it", option1:"",option2:"",option3:"",option4:"",answer:"correct answer" },generate 30questions. ${process.env.CUSTOMIZE_RES}`
+   const progress=await module1_generater(genProms);
+  responses.send(progress);
+})
 
 app.post("/fromsubmission", async (quries, responses) => {
   const data = quries.headers;
