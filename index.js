@@ -214,7 +214,7 @@ app.post("/math_solution", async (quries, responses) => {
 app.post("/mock_test", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
-  const genProms = `Generate a mock question answers based on \[ ${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer" },generate 30questions. ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a mock question answers based on \[ ${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer" },generate 20questions. ${process.env.CUSTOMIZE_RES}`
 try {
   const progress = await module1_generater(genProms);
 
@@ -223,12 +223,9 @@ try {
   ) {
     throw new Error("Invalid response structure from module1_generater");
   }
-
   const filePath = `${process.env.MCQDATA}${criteria.exam}.json`;
   const mcqText = progress.candidates[0].content.parts[0].text;
-
-  const postMcq = await post_mcq(filePath, mcqText);
-  responses.send(postMcq);
+  responses.send(mcqText);
 } catch (err) {
   console.error("Error generating MCQ:", err);
   responses.status(500).send({ error: err.message });
