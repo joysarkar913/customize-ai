@@ -67,9 +67,18 @@ return apis[Math.floor(Math.random() * apis.length)];;
 // }
 
 async function post_mcq(params,trainerPath) {
- const response =await fetch(trainerPath,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(params)}) 
-const result= await response.json();
-return result;
+   for (let q of trainerPath) {
+    // typo fix: categoty → category
+    const docData = {
+      category: q.category || q.categoty,
+      question: q.question,
+      body: q.body,
+      options: q.options,
+      answer: q.answer
+    };
+ const response =await fetch(params,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(docData)}) 
+}
+return trainerPath;
 }
 
 async function module_Trainer(params,trainerPath) {
@@ -225,7 +234,8 @@ try {
   }
   const filePath = `${process.env.MCQDATA}${criteria.exam}.json`;
   const mcqText = progress.candidates[0].content.parts[0].text;
-  responses.send(mcqText);
+  const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}`,mcqText)
+  responses.send(resPonse);
 } catch (err) {
   console.error("Error generating MCQ:", err);
   responses.status(500).send({ error: err.message });
