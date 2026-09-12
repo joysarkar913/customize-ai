@@ -91,6 +91,11 @@ async function module_Trainer_Data() {
 const result= await response.json();
 return result;
 }
+app.post('/questionModule',async(req,res)=>{
+  const mcqs= req.body:
+   const resPonse= await post_mcq(`${process.env.MCQDATA}${mcqs.exam}.json`,mcqs.data)
+res.send(resPonse)
+})
 app.post('/trained_my_module',async(req,res)=>{
 const traineddata=await module_Trainer(req.body,process.env.TRAINER);
 res.send(traineddata)
@@ -229,8 +234,8 @@ try {
   }
   const filePath = `${process.env.MCQDATA}${criteria.exam}.json`;
   const mcqText = progress.candidates[0].content.parts[0].text;
-  const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
-  responses.send(resPonse);
+  // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
+  responses.send(mcqText);
 } catch (err) {
   console.error("Error generating MCQ:", err);
   responses.status(500).send({ error: err.message });
