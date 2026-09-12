@@ -91,8 +91,8 @@ async function module_Trainer_Data() {
 const result= await response.json();
 return result;
 }
-app.post('/questionModule',async(req,res)=>{
-  const mcqs= req.body:
+app.post('/questionmodule',async(req,res)=>{
+  const mcqs= req.body;
    const resPonse= await post_mcq(`${process.env.MCQDATA}${mcqs.exam}.json`,mcqs.data)
 res.send(resPonse)
 })
