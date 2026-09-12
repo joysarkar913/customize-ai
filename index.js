@@ -8,17 +8,17 @@ app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
 // Select API path based on count thresholds
 
-const upload = multer({ dest: "uploads/" });
+// const upload = multer({ dest: "uploads/" });
 
-app.post("/extraxttext", upload.single("image"), async (req, res) => {
-  try {
-    const Tesseract = require("tesseract.js");
-    const result = await Tesseract.recognize(req.file.path, "eng");
-    res.json({ text: result.data.text });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// app.post("/extraxttext", upload.single("image"), async (req, res) => {
+//   try {
+//     const Tesseract = require("tesseract.js");
+//     const result = await Tesseract.recognize(req.file.path, "eng");
+//     res.json({ text: result.data.text });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 
 function apiPath() {
