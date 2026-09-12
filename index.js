@@ -1,4 +1,5 @@
 const express = require("express");
+const Tesseract = require("tesseract.js");
 const app = express();
 const multer = require("multer");
 const cors = require("cors");
@@ -6,11 +7,11 @@ const {MongoClient}=require('mongodb')
 app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
-// Select API path based on count thresholds
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 app.post("/extracttext", upload.single("image"), async (req, res) => {
+  
   try {
     // req.file.buffer contains the image data in memory
     const result = await Tesseract.recognize(req.file.buffer, "eng");
