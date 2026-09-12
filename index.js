@@ -74,11 +74,11 @@ async function post_mcq(params,trainerPath) {
       question: q.question,
       body: q.body,
       options: q.options,
-      answer: q.answer
-    };
- const response =await fetch(params,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(docData)}) 
-}
-return trainerPath;
+      answer: q.answer}
+    
+  await fetch(params,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(docData)}) 
+    }
+ return trainerPath;
 }
 
 async function module_Trainer(params,trainerPath) {
@@ -169,12 +169,7 @@ app.post("/ai_trainer",(req,res)=>{
 // ✅ New endpoint: Read only count
 
 app.get("/", async (quries, responses) => {
-  const data = quries.headers;
-  const props = quries.query;
-  const t = props.type
-  // const progress= await module1_generater(props.text);
-  // responses.send(progress);
-  responses.send("Test Mode, GET request not accepted and unauthorized access denied")
+responses.send("Test Mode, GET request not accepted and unauthorized access denied")
 })
 
 app.post("/workflow", async (quries, responses) => {
