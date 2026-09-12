@@ -66,6 +66,12 @@ return apis[Math.floor(Math.random() * apis.length)];;
 //   }
 // }
 
+async function post_mcq(params,trainerPath) {
+ const response =await fetch(trainerPath,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(params)}) 
+const result= await response.json();
+return result;
+}
+
 async function module_Trainer(params,trainerPath) {
  const response =await fetch(trainerPath,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(params)}) 
 const result= await response.json();
@@ -208,9 +214,10 @@ app.post("/math_solution", async (quries, responses) => {
 app.post("/mock_test", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
-  const genProms = `Generate a mock question answers based on \[ ${criteria.complain} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"question": "question","body": "only body if required else skip it", option1:"",option2:"",option3:"",option4:"",answer:"correct answer" },generate 30questions. ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a mock question answers based on \[ ${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer" },generate 30questions. ${process.env.CUSTOMIZE_RES}`
    const progress=await module1_generater(genProms);
-  responses.send(progress);
+  const postMcq=await post_mcq(`${progress.env.MCQDATA}${criteria.EXAM}.json`,progress.candidates[0].content.parts[0].text);
+  responses.send(postMcq);
 })
 
 app.post("/fromsubmission", async (quries, responses) => {
