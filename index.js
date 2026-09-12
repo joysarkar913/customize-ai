@@ -234,7 +234,7 @@ try {
   }
   const filePath = `${process.env.MCQDATA}${criteria.exam}.json`;
   const mcqText = progress.candidates[0].content.parts[0].text;
-  const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}`,mcqText)
+  const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
   responses.send(resPonse);
 } catch (err) {
   console.error("Error generating MCQ:", err);
