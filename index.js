@@ -6,6 +6,21 @@ app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
 // Select API path based on count thresholds
+const multer = require("multer");
+const Tesseract = require("tesseract.js");
+const upload = multer({ dest: "uploads/" });
+
+app.post("/extraxttext", upload.single("image"), async (req, res) => {
+  try {
+    const Tesseract = require("tesseract.js");
+    const result = await Tesseract.recognize(req.file.path, "eng");
+    res.json({ text: result.data.text });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 function apiPath() {
 const apis = [
   process.env.CUSTOMIZE_AI_API,
@@ -51,8 +66,8 @@ return apis[Math.floor(Math.random() * apis.length)];;
 //   }
 // }
 
-async function module_Trainer(params) {
- const response =await fetch(process.env.TRAINER,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(params)}) 
+async function module_Trainer(params,trainerPath) {
+ const response =await fetch(trainerPath,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(params)}) 
 const result= await response.json();
 return result;
 }
@@ -62,14 +77,31 @@ const result= await response.json();
 return result;
 }
 app.post('/trained_my_module',async(req,res)=>{
-const traineddata=await module_Trainer(req.body);
+const traineddata=await module_Trainer(req.body,process.env.TRAINER);
 res.send(traineddata)
 })
-
+app.post('/conversation',async(req,res)=>{
+const traineddata=await module_Trainer(req.body,process.env.CONV);
+res.send(traineddata)
+})
+app.post('/parsingfailed',async(req,res)=>{
+const traineddata=await module_Trainer(req.body,process.env.PERSF);
+res.send(traineddata)
+})
+app.post('/flowdata',async(req,res)=>{
+const traineddata=await module_Trainer(req.body,process.env.WEBDATA);
+res.send(traineddata)
+})
+app.post('/complaint_data',async(req,res)=>{
+const traineddata=await module_Trainer(req.body,process.env.COMPL);
+res.send(traineddata)
+})
 app.get('/trained_my_module',async ()=>{
 const traineddata=await module_Trainer_Data();
 res.send(traineddata)
 })
+
+
 const module1_generater=async(genProms)=>{
     try {
     const payload = {
@@ -160,6 +192,15 @@ app.post("/letter_writer", async (quries, responses) => {
   const last_Conversation = props.last
   const genProms = `Generate a purfect latter on the following criteria: \[ ${types} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"answer": "" } write as reacjs format html with embedded css format use line break ,space every thing properlymast usabel for reactjs. ${process.env.CUSTOMIZE_RES}`
  const progress=await module1_generater(genProms);
+  responses.send(progress);
+})
+
+
+app.post("/math_solution", async (quries, responses) => {
+  const data = quries.headers;
+  const criteria = quries.body;
+  const genProms = `Generate a proper solution  of the question is \[ ${criteria.complain} \] s based on math subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"solution": "" } write in html with embedded css format with remark of every solution solution format must look like as hand written , if it is not math question provide answer of the question with comment of understanding . ${process.env.CUSTOMIZE_RES}`
+   const progress=await module1_generater(genProms);
   responses.send(progress);
 })
 
