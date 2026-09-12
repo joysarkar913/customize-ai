@@ -199,7 +199,7 @@ app.post("/letter_writer", async (quries, responses) => {
 app.post("/math_solution", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
-  const genProms = `Generate a proper solution  of the question is \[ ${criteria.complain} \] based on context. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"solution": "" } write in html with embedded css format with remark of every solution solution format must look like as hand written , if it is math question provide answer with comment to get understanding in concept . ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a proper solution  of the question is \[ ${criteria.question} \] based on context. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"solution": "" } write in html with embedded css format with remark of every solution solution format must look like as hand written , if it is math question provide answer with comment to get understanding in concept . ${process.env.CUSTOMIZE_RES}`
    const progress=await module1_generater(genProms);
   responses.send(progress);
 })
