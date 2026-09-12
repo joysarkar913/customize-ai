@@ -1,13 +1,13 @@
 const express = require("express");
 const app = express();
+const multer = require("multer");
 const cors = require("cors");
 const {MongoClient}=require('mongodb')
 app.use(express.json());
 app.use(cors({ origin: "https://zerocorruptions.web.app" }));
 app.use(express.urlencoded({ extended: true }));
 // Select API path based on count thresholds
-const multer = require("multer");
-const Tesseract = require("tesseract.js");
+
 const upload = multer({ dest: "uploads/" });
 
 app.post("/extraxttext", upload.single("image"), async (req, res) => {
