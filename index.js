@@ -74,7 +74,8 @@ async function post_mcq(params,trainerPath) {
       question: q.question,
       body: q.body,
       options: q.options,
-      answer: q.answer}
+      answer: q.answer,
+    details:q.details}
     
   await fetch(params,{method:"POST",headers:{'Content_Type':'application/json'},body:JSON.stringify(docData)}) 
     }
@@ -93,7 +94,7 @@ return result;
 }
 app.post('/questionmodule',async(req,res)=>{
   const mcqs= req.body;
-   const resPonse= await post_mcq(`${process.env.MCQDATA}${mcqs.exam}.json`,mcqs.data)
+   const resPonse= await post_mcq(`${process.env.MCQDATA}${mcqs.exam}_updated.json`,mcqs.data)
 res.send(resPonse)
 })
 app.post('/trained_my_module',async(req,res)=>{
@@ -140,7 +141,7 @@ const module1_generater=async(genProms)=>{
       body: JSON.stringify(payload),
     })
     const reqJson = await fetchReq.json();
-    return reqJson;
+    return reqJson.candidates[0].content.parts[0].text;;
   
   } catch (error) {
     return error;
@@ -184,9 +185,17 @@ app.post("/workflow", async (quries, responses) => {
   const criteria = props.criteria;
   const label = props.label;
 
-  const genProms = `Generate a list of ${types} based on the following criteria: \[Insert criteria, e.g., ${criteria}\]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: { "title": ${label}, "description": "Short description", "link": "URL", "body": "Detailed ${types} content" }.${process.env.CUSTOMIZE_RES}`
- const progress=await module1_generater(genProms);
+  const genProms = `Generate a list of ${types} based on the following criteria: \[${criteria}\]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: { "title": ${label}, "description": "Short description", "link": "URL", "body": "Detailed ${types} content" }.${process.env.CUSTOMIZE_RES}`
+ try {
+  const progress = await module1_generater(genProms);
+
+  
+  // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
   responses.send(progress);
+} catch (err) {
+  console.error("Error generating MCQ:", err);
+  responses.status(500).send({ error: types });
+}
 })
 
 app.post("/question_and_answer", async (quries, responses) => {
@@ -195,8 +204,16 @@ app.post("/question_and_answer", async (quries, responses) => {
   const types = props.question;
   const last_Conversation = props.last
   const genProms = `Generate a answer based on the following question: \[ ${types} \] ${last_Conversation}. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {  "answer": "answer only","isGet":"if answer not found then put false else true" }.if answer not found then put all details/problems to answer field ${process.env.CUSTOMIZE_RES}`
-  const progress=await module1_generater(genProms);
+  try {
+  const progress = await module1_generater(genProms);
+
+  
+  // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
   responses.send(progress);
+} catch (err) {
+  console.error("Error generating MCQ:", err);
+  responses.status(500).send({ error: types});
+}
 })
 
 
@@ -206,8 +223,16 @@ app.post("/letter_writer", async (quries, responses) => {
   const types = props.question;
   const last_Conversation = props.last
   const genProms = `Generate a purfect latter on the following criteria: \[ ${types} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"answer": "" } write as reacjs format html with embedded css format use line break ,space every thing properlymast usabel for reactjs. ${process.env.CUSTOMIZE_RES}`
- const progress=await module1_generater(genProms);
+ try {
+  const progress = await module1_generater(genProms);
+
+  
+  // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
   responses.send(progress);
+} catch (err) {
+  console.error("Error generating MCQ:", err);
+  responses.status(500).send({ error: types });
+}
 })
 
 
@@ -215,30 +240,32 @@ app.post("/math_solution", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
   const genProms = `Generate a proper solution  of the question is \[ ${criteria.question} \] based on context. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"solution": "" } write in html with embedded css format with remark of every solution solution format must look like as hand written , if it is math question provide answer with comment to get understanding in concept . ${process.env.CUSTOMIZE_RES}`
-   const progress=await module1_generater(genProms);
+   try {
+  const progress = await module1_generater(genProms);
+
+  
+  // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
   responses.send(progress);
+} catch (err) {
+  console.error("Error generating MCQ:", err);
+  responses.status(500).send({ error: criteria.question });
+}
 })
 
 
 app.post("/mock_test", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
-  const genProms = `Generate a mock question answers based on \[ ${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer" },generate 20questions. ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a mock question answers based on \[ ${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer",details:"simple and short details like how is the answer is correct" },generate 15questions. ${process.env.CUSTOMIZE_RES}`
 try {
   const progress = await module1_generater(genProms);
 
-  if (
-    !progress?.candidates?.[0]?.content?.parts?.[0]?.text
-  ) {
-    throw new Error("Invalid response structure from module1_generater");
-  }
-  const filePath = `${process.env.MCQDATA}${criteria.exam}.json`;
-  const mcqText = progress.candidates[0].content.parts[0].text;
+  
   // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
-  responses.send(mcqText);
+  responses.send(progress);
 } catch (err) {
   console.error("Error generating MCQ:", err);
-  responses.status(500).send({ error: err.message });
+  responses.status(500).send({ error: criteria.request });
 }
 })
 
@@ -246,8 +273,16 @@ app.post("/fromsubmission", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
   const genProms = `Generate a draft of complaint based on the following complain criteria: \[ ${criteria.complain} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"comp_draft": "proper a complain letter dont use complainer name or phone or email , write mail as anonymous person","tegto": "find out some local authority mail id by using address of complainer and put here if unable to get the keep blank","isGet":"if answer not found then put false else true" }. ${process.env.CUSTOMIZE_RES}`
-   const progress=await module1_generater(genProms);
+   try {
+  const progress = await module1_generater(genProms);
+
+  
+  // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
   responses.send(progress);
+} catch (err) {
+  console.error("Error generating MCQ:", err);
+  responses.status(500).send({ error: criteria.complain });
+}
 })
 
 
