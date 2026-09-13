@@ -222,7 +222,7 @@ app.post("/letter_writer", async (quries, responses) => {
   const props = quries.body;
   const types = props.question;
   const last_Conversation = props.last
-  const genProms = `Generate a purfect latter on the following criteria: \[ ${types} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"add here all structure of html and css"} write as reacjs format html with embedded css format line break ,space every thing properlymast usabel for reactjs. ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a purfect latter on the following criteria: \[ ${types} \]. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"letter":""}  write in html format in a div container with embedded css all double quote replace into single quote , line break ,space every thing properlymast usabel for reactjs. ${process.env.CUSTOMIZE_RES}`
  try {
   const progress = await module1_generater(genProms);
 
@@ -239,13 +239,13 @@ app.post("/letter_writer", async (quries, responses) => {
 app.post("/math_solution", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
-  const genProms = `Generate a proper solution  of the question is \[ ${criteria.question} \] based on context. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"solution"} write in html format in a div container with embedded css all double quote replace into single quote insde the html and css with remark of every solution format must look like as hand written , if it is math question provide answer with comment to get understanding in concept . ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a proper solution  of the question is \[ ${criteria.question} \] based on context. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {"solution":""} write in html format in a div container with embedded css all double quote replace into single quote insde the html and css with remark of every solution format must look like as hand written , if it is math question provide answer with comment to get understanding in concept . ${process.env.CUSTOMIZE_RES}`
    try {
   const progress = await module1_generater(genProms);
 
   
   // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
-  responses.send(progress);
+  responses.send(progress.solution);
 } catch (err) {
   console.error("Error generating MCQ:", err);
   responses.status(500).send({ error: criteria.question });
