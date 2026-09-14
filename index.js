@@ -245,7 +245,7 @@ app.post("/math_solution", async (quries, responses) => {
 
   
   // const resPonse= await post_mcq(`${process.env.MCQDATA}${criteria.exam}.json`,mcqText)
-  responses.send(progress.solution);
+  responses.send(progress);
 } catch (err) {
   console.error("Error generating MCQ:", err);
   responses.status(500).send({ error: criteria.question });
