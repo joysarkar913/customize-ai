@@ -256,7 +256,7 @@ app.post("/math_solution", async (quries, responses) => {
 app.post("/mock_test", async (quries, responses) => {
   const data = quries.headers;
   const criteria = quries.body;
-  const genProms = `Generate a mock question answers based on \[ ${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer",details:"simple and short details like how is the answer is correct" },generate 15questions. ${process.env.CUSTOMIZE_RES}`
+  const genProms = `Generate a mock question answers based on \[ ${criteria.exam}${criteria.request} \] subject. Provide the output strictly in JSON format with no conversational text. Follow this schema for each item: {categoty:"example math,english,science etc","question": "question","body": "only body if required else skip it", options:[1st option,2nd option,3rd option,4th option],answer:"correct answer",details:"simple and short details like how is the answer is correct" },generate 15questions. ${process.env.CUSTOMIZE_RES}`
 try {
   const progress = await module1_generater(genProms);
 
